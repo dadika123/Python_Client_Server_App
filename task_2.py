@@ -1,4 +1,9 @@
-letter_1, letter_2, letter_3 = b'class', b'function', b'method'
-print(letter_1, letter_2, letter_3)
-print(type(letter_1), type(letter_2), type(letter_3))
-print(len(letter_1), len(letter_2), len(letter_3))
+def main():
+    words = ['class', 'method', 'function', ]
+    for word in words:
+        word_b = bytes(word, encoding='utf-8', errors='replace')
+        print(f"{type(word)} {word_b} {len(word_b)}")
+
+
+if __name__ == '__main__':
+    main()
