@@ -1,0 +1,18 @@
+{
+    "orders": [
+        {
+            "item": "ASUS GX531GM",
+            "quantity": 5,
+            "price": 135000,
+            "buyer": "Chuzhikov D. R.",
+            "date": "27.09.2020"
+        },
+        {
+            "item": "ASUS GX531GM",
+            "quantity": 5,
+            "price": 135000,
+            "buyer": "Chuzhikov D. R.",
+            "date": "27.09.2020"
+        }
+    ]
+}
