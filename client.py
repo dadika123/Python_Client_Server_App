@@ -1,8 +1,7 @@
-from socket import AF_INET, SOCK_STREAM, socket
+import argparse
 import pickle
 import time
-import argparse
-
+from socket import AF_INET, SOCK_STREAM, socket
 
 s = socket(AF_INET, SOCK_STREAM)
 parser = argparse.ArgumentParser(description='Messenger startup settings')
