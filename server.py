@@ -1,40 +1,43 @@
-from socket import AF_INET, SOCK_STREAM, SOL_SOCKET, SO_REUSEADDR, socket
-import pickle
-import argparse
+import clientserver
+import jim
 
-s = socket(AF_INET, SOCK_STREAM)
-
-parser = argparse.ArgumentParser(description='Messenger startup settings')
-parser.add_argument('--addr', default='0.0.0.0', help='address')
-parser.add_argument('--port', default=7777, help='port')
-args = parser.parse_args()
-arg_port = int(args.port)
-arg_addr = args.addr
-
-
-def init_socket():
-    s.bind((arg_addr, arg_port))
-    s.listen(6)
-    s.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-
-
-def main():
-    while True:
-        client, addr = s.accept()
-        print('Получен запрос на соединение от %s' % str(addr))
-        data = client.recv(1024)
-        response = {
-            'response': 200,
-            'alert': 'Вы успешно вошли в систему'
-        }
-        client.send(pickle.dumps(response))
-
-        client.close()
-
+client_name = ''
 
 if __name__ == '__main__':
-    socket = init_socket()
-    try:
-        main()
-    except Exception as text:
-        print('Ошибка! Сервер не запустился')
+    parser = clientserver.create_parser()
+    namespace = parser.parse_args()
+
+    sock = clientserver.get_server_socket(namespace.addr, namespace.port)
+
+    server_addr = sock.getsockname()
+    print(f'Server started at {server_addr[0]}:{server_addr[1]}')
+
+    client, address = sock.accept()
+    print(f'Client connected from {address[0]}:{address[1]}')
+
+    while True:
+        data = clientserver.get_data(client)
+
+        if client_name == '':
+            if data['action'] == 'presence' and data['user']['account_name'] != '':
+                client_name = data['user']['account_name']
+                jim.RESPONSE['response'], jim.RESPONSE['alert'] = jim.SERVER_RESP[0]
+                print(
+                    f'{data["time"]} - {data["user"]["account_name"]}: {data["user"]["status"]}')
+            else:
+                jim.RESPONSE['response'], jim.RESPONSE['alert'] = jim.SERVER_RESP[1]
+
+        if client_name != '' and data['action'] == 'msg':
+            print(f'{data["time"]} - {client_name}: {data["message"]}')
+            jim.RESPONSE['response'], jim.RESPONSE['alert'] = jim.SERVER_RESP[0]
+
+            if data["message"] == 'exit':
+                jim.RESPONSE['response'], jim.RESPONSE['alert'] = jim.SERVER_RESP[2]
+
+        clientserver.send_data(client, jim.RESPONSE)
+
+        if jim.RESPONSE['response'] != '200':
+            client.close()
+            break
+
+    sock.close()
