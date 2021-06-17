@@ -1,5 +1,5 @@
 import unittest
-import clientserver
+import chat.clientserver as clientserver
 
 
 class Testclientserver(unittest.TestCase):

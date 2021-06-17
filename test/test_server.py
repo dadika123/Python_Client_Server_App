@@ -1,5 +1,5 @@
 
-import clientserver
+import chat.clientserver as clientserver
 import socket
 import unittest
 import sys
