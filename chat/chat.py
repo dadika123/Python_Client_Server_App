@@ -2,19 +2,25 @@ import argparse
 import socket
 import json
 import logging
-import os.path
+import inspect
+from functools import wraps
 
 ADDRESS = 'localhost'
 PORT = 7777
 CONNECTIONS = 10
 
+server_logger = logging.getLogger('chat.server')
+client_logger = logging.getLogger('chat.client')
+
 
 def log(func):
-    def wrapped(*args, **kwargs):
-        logger = logging.getLogger('chat.decorator')
-        logger.info(f'Вызвана функция: {func.__name__}, с аргументами: {args, kwargs}')
+    @wraps(func)
+    def call(*args, **kwargs):
+        outer_func = inspect.stack()[1][3]
+        server_logger.debug(f'Function "{func.__name__}" is called into "{outer_func}"')
+        client_logger.debug(f'Function "{func.__name__}" is called into "{outer_func}"')
         return func(*args, **kwargs)
-    return wrapped
+    return call
 
 
 @log
@@ -48,9 +54,7 @@ def create_parser():
     )
 
     parser_group = parser.add_argument_group(title='Parameters')
-    parser_group.add_argument(
-        '-a', '--addr', default=ADDRESS, help='IP address')
-    parser_group.add_argument('-p', '--port', type=int,
-                              default=PORT, help='TCP port')
+    parser_group.add_argument('-a', '--addr', default=ADDRESS, help='IP address')
+    parser_group.add_argument('-p', '--port', type=int, default=PORT, help='TCP port')
 
     return parser

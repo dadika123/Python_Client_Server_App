@@ -1,29 +1,42 @@
 import logging
-
-import chat.clientserver as clientserver
+import chat.chat as chat
 import chat.jim as jim
 import log.client_log_config
 
 
 logger = logging.getLogger('chat.client')
 
-if __name__ == '__main__':
-    logger.debug('Клиент запущен')
+
+def main():
+    logger.debug('App started')
     client_name = input('Введите имя: ')
-    parser = clientserver.create_parser()
+
+    parser = chat.create_parser()
     namespace = parser.parse_args()
-    sock = clientserver.get_client_socket(namespace.addr, namespace.port)
-    server_addr = sock.getpeername()
-    print(f'Connected to server: {server_addr[0]}:{server_addr[1]}')
-    logger.info(f'Connected to server: {server_addr[0]}:{server_addr[1]}')
+
+    sock = chat.get_client_socket(namespace.addr, namespace.port)
+
+    serv_addr = sock.getpeername()
+    start_info = f'Connected to server: {serv_addr[0]}:{serv_addr[1]}'
+    print(start_info)
+    logger.info(start_info)
+
     jim.PRESENCE['user']['account_name'] = client_name
-    clientserver.send_data(sock, jim.PRESENCE)
+    try:
+        chat.send_data(sock, jim.PRESENCE)
+        logger.info(f'Presence sended to {serv_addr} : {jim.PRESENCE}')
+    except ConnectionResetError as e:
+        logger.error(e)
+        sock.close()
+        exit(1)
 
     while True:
         try:
-            data = clientserver.get_data(sock)
-        except ConnectionResetError:
-            logger.info(ConnectionResetError)
+            data = chat.get_data(sock)
+            logger.info(f'Data received from {serv_addr} : {data}')
+        except ConnectionResetError as e:
+            logger.error(e)
+            break
 
         if data['response'] != '200':
             break
@@ -32,11 +45,16 @@ if __name__ == '__main__':
         jim.MESSAGE['message'] = msg
 
         try:
-            clientserver.send_data(sock, jim.MESSAGE)
-            logger.info(
-                f'Сообщение размером:{len(jim.MESSAGE)} направлено пользователю - {server_addr}')
-        except ConnectionResetError:
-            logger.error(ConnectionResetError)
+            chat.send_data(sock, jim.MESSAGE)
+            logger.info(f'Data sended to {serv_addr} : {jim.MESSAGE}')
+        except ConnectionResetError as e:
+            logger.error(e)
+            break
 
-    logger.info('Приложение завершено!')
+    logger.debug('App ending')
+
     sock.close()
+
+if __name__ == '__main__':
+
+    main()

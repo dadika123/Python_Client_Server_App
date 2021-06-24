@@ -3,10 +3,9 @@ import os.path
 
 
 logger = logging.getLogger('chat.client')
-formatter = logging.Formatter(
-    "%(asctime)s - %(levelname)-8s - %(module)-8s - %(message)s ")
-storage_name = 'log-storage'
+formatter = logging.Formatter("%(asctime)s - %(levelname)-8s - %(module)-8s - %(message)s ")
 
+storage_name = 'log-storage'
 if not os.path.exists(storage_name):
     os.mkdir(storage_name)
 filename = os.path.join(storage_name, 'chat.client.log')
@@ -23,4 +22,4 @@ if __name__ == '__main__':
     console.setLevel(logging.DEBUG)
     console.setFormatter(formatter)
     logger.addHandler(console)
-    logger.info('Тестовый запуск журналирования')
+    logger.info('Тестовый запуск логирования')

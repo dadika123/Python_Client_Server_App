@@ -1,5 +1,6 @@
 from datetime import datetime
 
+
 TIME = datetime.now().replace(microsecond=0).isoformat(sep=' ')
 
 RESPONSE = {
@@ -16,7 +17,7 @@ PRESENCE = {
     "type": "status",
     "user": {
         "account_name": '',
-        "status": "Я здесь!"
+        "status": "Yep, I am here!"
     }
 }
 
@@ -27,8 +28,8 @@ MESSAGE = {
     "message": None
 }
 
-SERVER_RESP = (
-    ('200', 'Ок'),
+SERV_RESP = (
+    ('200', 'OK'),
     ('401', 'Не авторизован'),
-    ('404', 'Не найден')
+    ('404', 'Not found')
 )
