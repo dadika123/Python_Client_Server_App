@@ -8,7 +8,7 @@ RESPONSE = {
     "time": str(TIME),
     "alert": None,
     "from": 'Server',
-    "contacts": None
+    "contacts": []
 }
 
 PRESENCE = {
@@ -24,6 +24,7 @@ PRESENCE = {
 MESSAGE = {
     "action": "msg",
     "time": str(TIME),
+    "from": None,
     "to": None,
     "message": None
 }
